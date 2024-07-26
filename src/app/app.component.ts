@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { FormBuilder, Validators } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 
 interface Product {
@@ -18,6 +19,8 @@ interface Product {
 
 
 export class AppComponent {
+
+  currency = '$';
 
   productsData: Product[] = [
     {
@@ -119,30 +122,41 @@ export class AppComponent {
     },
   ]
 
+
+  form = this.fb.group({
+    product: ["",Validators.required],
+    name: ["",Validators.required],
+    phone: ["",Validators.required],
+  });
+
+  constructor(private fb: FormBuilder){
+
+  }
  
   //Navigation
   
   // Function scroll to elements
 
-  scrollTo(target: HTMLElement){
+  scrollTo(target: HTMLElement, product?: any){
     target.scrollIntoView({behavior: "smooth"});
+    if (product) {
+      this.form.patchValue({product: product.title + ' (' + product.price + ' ' + this.currency + ')'});
+    }
   }
 
   //Scroll from products and paste product's name to input block  
 
-  
+  //   onProductClick(index: number): void {
+  //     const productNameElements = document.getElementsByClassName("products-item-title") as HTMLCollectionOf<HTMLElement>;
+  //     const orderElement = document.getElementById("order") as HTMLElement;
+  //     const productInputElement = document.getElementById("product") as HTMLInputElement;
 
-          //   onProductClick(index: number): void {
-          //     const productNameElements = document.getElementsByClassName("products-item-title") as HTMLCollectionOf<HTMLElement>;
-          //     const orderElement = document.getElementById("order") as HTMLElement;
-          //     const productInputElement = document.getElementById("product") as HTMLInputElement;
-
-              
-          //     if (orderElement && productInputElement && productNameElements[index]) {
-          //       this.scrollTo(orderElement)
-          //       productInputElement.value = productNameElements[index].innerText;
-          //     }
-          // }
+      
+  //     if (orderElement && productInputElement && productNameElements[index]) {
+  //       this.scrollTo(orderElement)
+  //       productInputElement.value = productNameElements[index].innerText;
+  //     }
+  // }
 
 
 
@@ -160,7 +174,7 @@ async fetchExchangeRates(): Promise<{ [key: string]: number }> {
 
 async convertCurrency(toCurrency: string, newCurrency: string) {
   const exchangeRates = await this.fetchExchangeRates();
-  const priceElements = document.getElementsByClassName("products-item-price") as HTMLCollectionOf<HTMLElement>;
+  const priceElements = document.getElementsByClassName("products-item-price")
 
   Array.from(priceElements).forEach(priceElement => {
       const productItem = priceElement.closest('.products-item') as HTMLElement;
@@ -180,34 +194,41 @@ async convertCurrency(toCurrency: string, newCurrency: string) {
 }
 
 async changeCurrency() {
-  const currencyElement = document.getElementById('change-currency') as HTMLElement;
-  const currentCurrency = currencyElement.innerText;
 
   let newCurrency = '$';
   let targetCurrency = 'USD';
 
-  if (currentCurrency === '$') {
+  if (this.currency === '$') {
       newCurrency = '₽';
       targetCurrency = 'RUB';
-  } else if (currentCurrency === '₽') {
+  } else if (this.currency === '₽') {
       newCurrency = 'BYN';
       targetCurrency = 'BYN';
-  } else if (currentCurrency === 'BYN') {
+  } else if (this.currency === 'BYN') {
       newCurrency = '€';
       targetCurrency = 'EUR';
-  } else if (currentCurrency === '€') {
+  } else if (this.currency === '€') {
       newCurrency = '¥';
       targetCurrency = 'CNY';
-  } else if (currentCurrency === '¥') {
+  } else if (this.currency === '¥') {
       newCurrency = '₴';
       targetCurrency = 'UAH';
   }
 
-  currencyElement.innerText = newCurrency;
+  this.currency = newCurrency;
 
   // Convert and update the prices
   await this.convertCurrency(targetCurrency, newCurrency);
 }
 
+
+
+
+confirmOrder(){
+  if(this.form.valid){
+    alert("Спасибо за заказ! Мы скоро свяжемся с вами!")
+    this.form.reset();
+  }
+}
 
 }

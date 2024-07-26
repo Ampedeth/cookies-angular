@@ -1,5 +1,5 @@
 <main class="main">
-  <div class="currency" title="Изменить валюту" id="change-currency" (click)="changeCurrency()">$</div>
+  <div class="currency" title="Изменить валюту" id="change-currency" (click)="changeCurrency()">{{currency}}</div>
   <!--Header-->
   <header class="header">
     <div class="container">
@@ -61,10 +61,10 @@
 
             <div class="products-item-extra">
               <div class="products-item-info">
-                <div class="products-item-price">{{product.price}} $</div>
+                <div class="products-item-price">{{product.price}} {{currency}}</div>
                 <div class="products-item-weight">{{product.weight}}</div>
               </div>
-              <button class="violet-button btn" (click)="scrollTo(order)">
+              <button class="violet-button btn" (click)="scrollTo(order, product)">
                 Заказать
               </button>
             </div>
@@ -115,14 +115,14 @@
             Откройте для себя волшебство вкуса с нашим премиальным печеньем!
             Закажите прямо сейчас и окунитесь в мир сладких наслаждений.
           </div>
-          <div class="order-form-inputs">
-            <input type="text" placeholder="Выберите печенье" id="product" />
+          <div class="order-form-inputs" [formGroup]="form">
+            <input type="text" placeholder="Выберите печенье" id="product" formControlName="product" [class]="{'error': form.get('product')?.invalid && (form.get('product')?.dirty || form.get('product')?.touched)}" readonly/>
 
-            <input type="text" placeholder="Ваше имя" id="userName" />
+            <input type="text" placeholder="Ваше имя" id="userName"  formControlName="name" [class]="{'error': form.get('name')?.invalid && (form.get('name')?.dirty || form.get('name')?.touched)}"/>
 
-            <input type="text" placeholder="Ваш телефон" id="phone" />
+            <input type="text" placeholder="Ваш телефон" id="phone" formControlName="phone" [class]="{'error': form.get('phone')?.invalid && (form.get('phone')?.dirty || form.get('phone')?.touched)}"/>
 
-            <button class="violet-button btn" id="order-action">
+            <button class="violet-button btn" id="order-action" (click)="confirmOrder()" [disabled]="!form.valid">
               Оформить заказ
             </button>
           </div>
